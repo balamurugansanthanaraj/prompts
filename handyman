@@ -1,0 +1,74 @@
+# Role
+Act as a Principal Software Engineer specializing in modern Python automation.
+
+# Task
+Build a modular, extensible CLI tool named `handyman` using **Python 3.11**.
+The tool serves as a multi-purpose utility for DevOps operations.
+The first module to implement is `bitbucket`.
+
+# Architecture
+1. **Framework:** Use `Typer` for the CLI interface.
+2. **Nesting Strategy:**
+   - Root command: `handyman`
+   - Module command: `bitbucket`
+   - Sub-commands: `init`, `validate`, `codeScan`
+   - Full invocation example: `handyman bitbucket codeScan --config bitbucket_params.yml`
+3. **Configuration:** The tool relies on a strict YAML configuration file parsed via Pydantic.
+
+# Detailed Command Requirements
+
+## 1. Command: `handyman bitbucket init`
+- **Action:** Generates a sample configuration file named `bitbucket_params.yml`.
+- **Content:** Populates the file with the *exact* YAML structure defined below (use dummy values).
+- **Constraint:** Check if the file exists first. If it does, ask the user for confirmation before overwriting.
+
+## 2. Command: `handyman bitbucket validate`
+- **Action:** Accepts a config file path (default: `bitbucket_params.yml`).
+- **Logic:** Uses **Pydantic** to strictly validate the YAML schema.
+- **Output:** Prints a formatted success message (Green) or a detailed list of validation errors (Red) using the `rich` library.
+
+## 3. Command: `handyman bitbucket codeScan`
+- **Arguments:** `--config` (default: `bitbucket_params.yml`).
+- **Logic:**
+  1. **Auto-Validate:** Run the validation logic internally first. Stop if invalid.
+  2. **Discovery:** Connect to the Bitbucket API (using `requests`) to iterate through projects/repos defined in the YAML.
+  3. **Hybrid Analysis:**
+     - Perform a `git clone --bare` to a temporary directory.
+     - Use `subprocess` to run git commands for: First/Last Committer, Commit Dates, and Top Committer.
+  4. **Language Detection:**
+     - Scan file extensions in the bare clone.
+     - Logic: `Count(extensions) -> Sort Descending -> Pick Top`.
+     - Ignore: `.git` folder, binary files, and common config files.
+  5. **Output:** Route data to the enabled sinks (CSV, JSON, OpenSearch).
+
+# Configuration Schema (Strict)
+You must use Pydantic to parse this specific structure (List-of-Dicts pattern):
+
+```yaml
+api:
+  - url: "[https://bitbucket.example.com](https://bitbucket.example.com)"
+  - token: "ENV_VAR_OR_STRING"
+  - username: ""
+projects:
+  project_key_1:
+    - name: "app1"
+    - includeArchive: false
+    - token: "OPTIONAL_OVERRIDE_TOKEN"
+    - username: ""
+    - excludeRepos:
+        - repo1
+        - repo2
+output:
+  - fileTypes:
+      - json:
+          - enable: true
+          - path: "./output.json"
+      - csv:
+          - enable: true
+          - path: "./output.csv"
+  - opensearch:
+      - enable: true
+      - url: "[https://opensearch.example.com](https://opensearch.example.com)"
+      - username: "admin"
+      - password: "password"
+      - index: "handyman-codescan"
