@@ -1,0 +1,12 @@
+const today = new Date();
+
+for (const r of items[0].json.rota) {
+  const start = new Date(r.week_start);
+  const end = new Date(r.week_end);
+
+  if (today >= start && today <= end) {
+    return [{ json: { assignee: r.support_engineer } }];
+  }
+}
+
+return [{ json: { assignee: "default.user" } }];
