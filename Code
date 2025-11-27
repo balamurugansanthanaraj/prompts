@@ -1,12 +1,22 @@
+
+const rota = items[0].json.rota;
 const today = new Date();
 
-for (const r of items[0].json.rota) {
-  const start = new Date(r.week_start);
-  const end = new Date(r.week_end);
+let selected = null;
 
-  if (today >= start && today <= end) {
-    return [{ json: { assignee: r.support_engineer } }];
+for (const r of rota) {
+  const from = new Date(r.week_start);
+  const to = new Date(r.week_end);
+
+  if (today >= from && today <= to) {
+    selected = r.assignee;
+    break;
   }
 }
 
-return [{ json: { assignee: "default.user" } }];
+// Fallback user if no match
+if (!selected) {
+  selected = "default_support_user";
+}
+
+return [{ json: { assignee: selected } }];
