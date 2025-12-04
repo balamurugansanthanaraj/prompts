@@ -1,0 +1,200 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "manual"
+      },
+      "name": "Manual Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "repository": "YOUR_ORG/YOUR_REPO_NAME",
+        "options": {
+          "filePatterns": [
+            "**/*.java",
+            "**/log4j2.xml"
+          ]
+        },
+        "gitHubApi": {
+          "credentialId": "YOUR_GITHUB_CREDENTIAL_ID"
+        }
+      },
+      "name": "1. Get Source Code Files",
+      "type": "n8n-nodes-base.gitHub",
+      "typeVersion": 1,
+      "position": [
+        430,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const maxChunkSize = 3500; // Tokens/Characters for GPT-3.5\nconst overlap = 500; // Overlapping text for context\n\nconst chunks = [];\n\nfor (const item of $input.all()) {\n  const filename = item.json.name; // Assumes GitHub output includes name\n  const content = Buffer.from(item.json.content, 'base64').toString('utf8'); // Decode base64 content\n\n  if (content.length <= maxChunkSize) {\n    // Small enough file, send as one chunk\n    chunks.push({\n      filename: filename,\n      chunk: content,\n      lines: `1-${content.split('\\n').length}`\n    });\n  } else {\n    // Chunk larger files\n    for (let i = 0; i < content.length; i += maxChunkSize - overlap) {\n      const chunk = content.substring(i, i + maxChunkSize);\n      const startLine = content.substring(0, i).split('\\n').length;\n      const endLine = startLine + chunk.split('\\n').length - 1;\n\n      chunks.push({\n        filename: filename,\n        chunk: chunk,\n        lines: `${startLine}-${endLine}`,\n      });\n    }\n  }\n}\n\nreturn chunks;"
+      },
+      "name": "2. Chunk Code (Code Node)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        620,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "operation": "chat",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a specialized code auditor for logging compliance. Your task is to review Java code for potential high-volume logging practices (debug/trace levels) that lack guard clauses. Output findings as a single JSON object."
+          },
+          {
+            "role": "user",
+            "content": "Analyze the following code chunk from file: **{{ $json.filename }}** (Lines: **{{ $json.lines }}**).\n\nSpecifically, look for the following methods: `logger.debug(` or `logger.trace(`.\n\nIf a call is found, check if it's protected by an `if (logger.isDebugEnabled())` or similar guard.\n\nOutput a JSON array named `findings`. Each object in the array must contain `file`, `lines`, `snippet`, and `issue` (e.g., 'Unprotected DEBUG call'). If no issues are found, the array must be empty.\n\nCODE: \n```java\n{{ $json.chunk }}\n```"
+          }
+        ],
+        "options": {
+          "responseFormat": "json_object"
+        },
+        "openAiApi": {
+          "credentialId": "YOUR_OPENAI_CREDENTIAL_ID"
+        }
+      },
+      "name": "3. LLM Code Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        810,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "combineData": true,
+        "mode": "json",
+        "options": {}
+      },
+      "name": "4. Merge Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const allFindings = [];\n\nfor (const item of $input.all()) {\n  try {\n    const response = JSON.parse(item.json.choices[0].message.content);\n    if (response.findings && Array.isArray(response.findings) && response.findings.length > 0) {\n      allFindings.push(...response.findings);\n    }\n  } catch (error) {\n    // Handle cases where LLM might not return perfect JSON\n    console.error(`Failed to parse JSON for item: ${item.json.filename}`, error);\n  }\n}\n\n// Add a summary of total findings\nreturn [{\n    findings: allFindings,\n    totalFindings: allFindings.length\n}];"
+      },
+      "name": "5. Aggregate Findings",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1190,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.totalFindings }}",
+              "value2": "0",
+              "operation": "notEqual"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "6. Has Findings?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "access_token",
+        "channel": "#alerts-logging-audit",
+        "text": "## 🚨 Log4j Volume Audit Alert\n\n**Total Risky Findings:** {{ $json.totalFindings }}\n\n### Findings Summary\n\n```\n{{ JSON.stringify($json.findings, null, 2) }}\n```\n\n**Action Required:** Review the listed files and add guard clauses to DEBUG/TRACE logging calls.",
+        "options": {}
+      },
+      "name": "7. Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1570,
+        150
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Start": [
+      [
+        {
+          "node": "1. Get Source Code Files",
+          "index": 0
+        }
+      ]
+    ],
+    "1. Get Source Code Files": [
+      [
+        {
+          "node": "2. Chunk Code (Code Node)",
+          "index": 0
+        }
+      ]
+    ],
+    "2. Chunk Code (Code Node)": [
+      [
+        {
+          "node": "3. LLM Code Analysis",
+          "index": 0
+        }
+      ]
+    ],
+    "3. LLM Code Analysis": [
+      [
+        {
+          "node": "4. Merge Results",
+          "index": 0
+        }
+      ]
+    ],
+    "4. Merge Results": [
+      [
+        {
+          "node": "5. Aggregate Findings",
+          "index": 0
+        }
+      ]
+    ],
+    "5. Aggregate Findings": [
+      [
+        {
+          "node": "6. Has Findings?",
+          "index": 0
+        }
+      ]
+    ],
+    "6. Has Findings?": [
+      [
+        {
+          "node": "7. Send Slack Alert",
+          "index": 0
+        }
+      ],
+      []
+    ]
+  }
+}
