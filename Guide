@@ -1,0 +1,39 @@
+These engineering and prompting keywords act as high-density directives, forcing an LLM out of generic "tutorial-grade" code and into robust, senior-level patterns.
+Rather than chaining them randomly, organize them by intent across your prompts:
+1. Code Quality & Architecture Constraints
+Use these to prevent fragile, naive scripts and demand enterprise-grade system design.
+ * Idempotent: "Ensure this script is fully idempotent so re-running it on existing resources causes no unintended side effects or duplicate records."
+ * Defensive programming: "Apply defensive programming: validate all input parameters, check for null/undefined, and fail fast with clear errors."
+ * Production-ready & Load-bearing: "Refactor this proof-of-concept into production-ready, load-bearing code, including connection pooling, structured logging, and health checks."
+ * Canonical & Idiomatic: "Write canonical, idiomatic Go for this service instead of porting Java patterns directly."
+ * Graceful degradation: "Implement graceful degradation so if the downstream cache fails, the service falls back to the database without throwing 500s."
+ * Stripe-shaped API: "Design a Stripe-shaped REST API for billing with predictable resource-oriented URLs, nested endpoints, and idempotent mutation headers."
+ * Contract-first: "Generate the OpenAPI 3.1 specification contract-first before writing any controller implementations."
+ * Orthogonal: "Refactor these modules so the business domain and persistence logic remain completely orthogonal."
+ * Fluid interface: "Expose a fluid interface builder pattern to construct this complex configuration object."
+ * Atomic: "Ensure the database mutations across both tables execute as a single atomic transaction."
+2. Testing & Edge Handling
+Use these to avoid bare-minimum test suites that only test trivial scenarios.
+ * Happy path & Edge cases: "Do not just test the happy path; explicitly cover critical edge cases such as empty payloads, network timeouts, and concurrent writes."
+ * Red-Green-Refactor: "Guide me through this feature using a strict Red-Green-Refactor TDD approach. Provide the failing test first."
+ * Smoke test & Test matrix: "Write a fast smoke test suite for post-deployment verification alongside a comprehensive test matrix for multi-runtime validation."
+ * Belt-and-suspenders: "Add belt-and-suspenders safety checks around this database migration to verify table state before and after execution."
+3. Performance & Computational Complexity
+Use these when standard loops or unoptimized lookups cause bottlenecks.
+ * O(1) lookup: "Index this dataset into a hash map to maintain O(1) lookup time during reconciliation."
+ * Vectorized & Single-pass: "Avoid Python iterative loops; implement a single-pass vectorized solution using NumPy."
+ * Non-blocking & Async: "Rewrite this pipeline using non-blocking, async I/O to maximize throughput under heavy concurrency."
+4. Prompt Engineering & Meta-Instructions
+Use these to structure the LLM's own reasoning and output format.
+ * Delimit & XML tags: "Delimit the raw data using <source_data>...</source_data> XML tags to prevent prompt injection."
+ * Chain-of-thought: "Use step-by-step chain-of-thought reasoning before outputting the final architectural decision."
+ * Few-shot: "Here are two few-shot examples of our expected schema output before you parse the rest."
+ * Pre-fill: (For API/Claude calls) Pre-fill the assistant turn with {"status": or ````json` to force immediate valid JSON generation without conversational preamble.
+Example "Super-Prompt" Putting Them Together
+> "Act as a principal backend engineer. Design a contract-first, Stripe-shaped API for an order reconciliation service.
+>  * Code must be idiomatic, production-ready, and strictly idempotent.
+>  * Use defensive programming with non-blocking, async handlers and O(1) lookup structures.
+>  * Ensure graceful degradation if downstream queues stall.
+>  * Provide an atomic database transaction example, followed by a test matrix covering both the happy path and failure edge cases.
+>  * Structure your reasoning using chain-of-thought inside <analysis> XML tags before outputting the code."
+> 
