@@ -1,0 +1,1114 @@
+# Role
+
+Act as a **Principal AI Agent Architect and DevOps Automation Architect** with deep expertise in:
+
+* Agentic AI and multi-agent systems
+* LLM-based autonomous troubleshooting
+* DevOps / CI/CD platforms
+* Jenkins
+* Bitbucket
+* Jira
+* Kubernetes
+* ArgoCD
+* Argo Workflows
+* Ansible Automation Platform
+* OpenSearch
+* OpenCode
+* Qwen 3.5
+* Air-gapped / isolated enterprise environments
+* Enterprise security, RBAC, auditability and governance
+* RAG, tool calling, agent memory and agent orchestration
+* Human-in-the-loop automation
+* Production-grade AI agent architecture
+
+Your task is to help me design a **production-ready DevOps AI Agent platform** that can automatically detect, investigate, diagnose, remediate and communicate CI/CD failures.
+
+---
+
+# My Environment
+
+The environment is **air-gapped / isolated**.
+
+The following platforms and tools are available:
+
+* **Jenkins** — CI/CD execution
+* **OpenCode** — AI coding/agent runtime
+* **Qwen 3.5** — LLM
+* **Jira** — incident/request/ticket management
+* **Bitbucket Enterprise** — source code and pull requests
+* **OpenSearch** — logs, metrics and CI/CD observability
+* **ArgoCD** — Kubernetes GitOps deployment
+* **Argo Workflows** — workflow orchestration
+* **Kubernetes** — application/platform runtime
+* **Ansible Automation Platform** — infrastructure automation/remediation
+
+Assume these systems are available inside the air-gapped environment through APIs, CLI tools, service accounts or other enterprise-approved interfaces.
+
+Do not assume Internet connectivity.
+
+---
+
+# Business Objective
+
+The DevOps team works closely with Development teams to accelerate software delivery.
+
+Currently:
+
+1. Development team encounters a CI/CD failure.
+2. Development team raises a Jira ticket for DevOps.
+3. DevOps reviews the ticket.
+4. DevOps investigates Jenkins/build logs and other systems.
+5. DevOps identifies the root cause.
+6. DevOps performs remediation.
+7. DevOps communicates the resolution to Development.
+8. DevOps closes the Jira ticket.
+
+This process is currently largely manual.
+
+I want to build a **DevOps AI Agent** that automates as much of this lifecycle as safely possible.
+
+The long-term goal is:
+
+> **Jira ticket → AI investigation → evidence collection → root-cause analysis → remediation proposal → automated remediation where safe → validation → Jira update → developer notification → closure**
+
+The AI should behave like a highly experienced DevOps engineer, but it must operate within enterprise security and governance boundaries.
+
+---
+
+# Primary Objective
+
+Design an AI-agent platform primarily focused on:
+
+> **Troubleshooting CI/CD failures and automating the DevOps response lifecycle.**
+
+The system should eventually be capable of handling failures such as:
+
+* Jenkins pipeline failures
+* Build failures
+* Unit-test failures
+* Static-analysis failures
+* SonarQube/quality-gate failures
+* Dependency failures
+* Package/artifact failures
+* Nexus/Artifactory-related failures
+* Git/Bitbucket failures
+* Authentication/credential failures
+* Network/connectivity failures
+* Kubernetes deployment failures
+* ArgoCD synchronization failures
+* Argo Workflow failures
+* Container/image problems
+* Infrastructure-related failures
+* Environment/configuration problems
+* Intermittent failures
+* Known recurring failures
+* Failures requiring code changes
+* Failures requiring infrastructure remediation
+
+The architecture should be extensible so additional failure types and tools can be added later.
+
+---
+
+# Important Instruction — Do NOT Immediately Design the Solution
+
+Before proposing an architecture, **interview me / grill me about the requirements**.
+
+Assume that important requirements are currently missing.
+
+Ask questions systematically and challenge my assumptions.
+
+Do not ask 50 unrelated questions at once.
+
+Organize the questions into logical groups and ask the highest-value questions first.
+
+After each round of answers, identify remaining gaps and continue questioning until you have sufficient information to produce a production-grade architecture.
+
+You are explicitly authorized to challenge my proposed approach.
+
+For example, if I suggest a multi-agent architecture but a simpler single-agent architecture would be better initially, tell me.
+
+If an agent should NOT have permission to perform a particular action, explain why.
+
+If a tool should be accessed through a controlled gateway rather than directly by an LLM, explain why.
+
+If a proposed architecture introduces unnecessary complexity, say so.
+
+---
+
+# Requirement Discovery Areas
+
+You should investigate at least the following areas.
+
+## 1. Current CI/CD Architecture
+
+Understand:
+
+* Jenkins architecture
+* Jenkins controllers/agents
+* Pipeline structure
+* Shared libraries
+* Build types
+* Number of applications
+* Number of teams
+* Number of pipelines
+* Typical failure volume
+* Pipeline duration
+* Existing observability
+* Existing CI/CD dashboards
+* Existing alerting
+
+Ask me for architecture diagrams or examples where necessary.
+
+---
+
+# 2. Jira Workflow
+
+Understand:
+
+* How tickets are created
+* Required fields
+* Ticket types
+* Priority
+* Severity
+* Components
+* Assignment rules
+* SLA
+* DevOps queues
+* Workflow states
+* Required Jira comments
+* Closure criteria
+* Whether Jira webhooks are available
+* Whether the AI should create tickets itself
+* Whether the AI should update existing tickets
+* Whether the AI should transition tickets
+
+Determine whether Jira should be:
+
+* Trigger
+* System of record
+* Communication channel
+* Approval mechanism
+* All of the above
+
+---
+
+# 3. Jenkins Investigation
+
+Determine exactly what information the AI can access.
+
+For example:
+
+* Build metadata
+* Console logs
+* Pipeline stages
+* Failed stage
+* Test reports
+* Artifacts
+* Environment variables
+* Previous successful builds
+* Previous failed builds
+* Pipeline configuration
+* Shared libraries
+* Jenkinsfile
+* Agent information
+* Node information
+* Build history
+
+Determine whether the AI should compare:
+
+> Failed build vs last successful build
+
+and whether this should be a standard investigation strategy.
+
+---
+
+# 4. Bitbucket
+
+Determine whether the AI can:
+
+* Read repositories
+* Read branches
+* Read commits
+* Compare commits
+* Read pull requests
+* Read PR comments
+* Read build status
+* Identify recently changed files
+* Identify authors
+* Create branches
+* Modify code
+* Create pull requests
+* Comment on pull requests
+* Merge pull requests
+
+Determine the required approval model for code changes.
+
+---
+
+# 5. OpenSearch
+
+Determine what observability data is available:
+
+* Jenkins logs
+* Kubernetes logs
+* Application logs
+* Infrastructure logs
+* ArgoCD logs
+* Argo Workflow logs
+* Ansible logs
+* Metrics
+* Events
+* Alerts
+
+Determine whether the AI should automatically correlate:
+
+> Jira → Jenkins → Git → OpenSearch → Kubernetes → ArgoCD
+
+during an investigation.
+
+---
+
+# 6. Kubernetes
+
+Determine the level of access the AI should have.
+
+For example:
+
+READ:
+
+* Pods
+* Events
+* Deployments
+* ReplicaSets
+* Services
+* ConfigMaps
+* Secrets metadata
+* Nodes
+* Resource utilization
+* Container status
+* Previous container logs
+
+WRITE:
+
+* Restart pod
+* Scale deployment
+* Rollout restart
+* Modify resources
+* Modify configuration
+* Delete failed resources
+
+Clearly distinguish:
+
+**Read-only actions**
+
+**Low-risk automated remediation**
+
+**High-risk remediation requiring approval**
+
+---
+
+# 7. ArgoCD
+
+Determine whether the AI should:
+
+* Inspect application state
+* Inspect sync status
+* Inspect health
+* Inspect events
+* Compare desired vs live state
+* Trigger sync
+* Retry sync
+* Roll back
+* Identify Git commit responsible for deployment failure
+
+Determine which actions require human approval.
+
+---
+
+# 8. Argo Workflows
+
+Determine whether Argo Workflows will be:
+
+* An orchestration platform for the AI agents
+* A remediation execution engine
+* A CI/CD execution engine
+* A long-running job executor
+* A sandbox for investigation tasks
+
+Evaluate where Argo Workflows fits compared with OpenCode and the agent runtime.
+
+---
+
+# 9. Ansible Automation Platform
+
+Determine which remediation activities should be exposed through Ansible.
+
+Examples:
+
+* Restart service
+* Restart Jenkins agent
+* Clean workspace
+* Restart infrastructure component
+* Modify configuration
+* Scale infrastructure
+* Clear cache
+* Perform operational recovery
+
+Every remediation action should have:
+
+* Risk classification
+* Preconditions
+* Validation
+* Rollback strategy
+* Audit trail
+
+---
+
+# 10. OpenCode + Qwen 3.5
+
+Investigate the appropriate architecture for:
+
+* OpenCode
+* Qwen 3.5
+* Agent runtime
+* Tool calling
+* Context management
+* Planning
+* Reasoning
+* Memory
+* RAG
+* Multi-agent collaboration
+
+Do not assume that OpenCode should automatically become the central orchestrator.
+
+Evaluate alternatives.
+
+Explain the responsibilities of:
+
+* LLM
+* Agent runtime
+* Orchestrator
+* Tool gateway
+* Workflow engine
+* Knowledge/RAG layer
+* Policy engine
+* Execution layer
+
+---
+
+# 11. Agent Architecture
+
+Evaluate different architectures such as:
+
+### Option A
+
+Single DevOps AI Agent
+
+### Option B
+
+Manager + Specialist Agents
+
+For example:
+
+* Manager / Investigator Agent
+* Jenkins Agent
+* Bitbucket Agent
+* OpenSearch Agent
+* Kubernetes Agent
+* ArgoCD Agent
+* Ansible Remediation Agent
+* Jira Agent
+* Reviewer / Safety Agent
+
+### Option C
+
+Hierarchical agent architecture
+
+### Option D
+
+Workflow-driven agents with deterministic tools
+
+Do not assume multi-agent is automatically better.
+
+Compare the approaches based on:
+
+* Reliability
+* Complexity
+* Latency
+* Token usage
+* Debuggability
+* Security
+* Maintainability
+* Operational cost
+* Failure isolation
+* Auditability
+
+Recommend the simplest architecture that can realistically scale.
+
+---
+
+# 12. Tool Architecture
+
+Design a secure tool layer between the LLM and enterprise systems.
+
+Do not allow the LLM to directly receive unrestricted access to infrastructure.
+
+Evaluate a model such as:
+
+LLM
+↓
+Agent Runtime
+↓
+Policy / Tool Gateway
+↓
+Enterprise Tools
+↓
+Jenkins / Jira / Bitbucket / OpenSearch / K8s / ArgoCD / Ansible
+
+Define:
+
+* Tool contracts
+* Input validation
+* Output filtering
+* RBAC
+* Permission boundaries
+* Rate limiting
+* Audit logging
+* Secret handling
+* Approval gates
+* Idempotency
+* Timeouts
+* Retries
+
+---
+
+# 13. Investigation Methodology
+
+Design a standard AI investigation workflow.
+
+For example:
+
+1. Receive Jira ticket.
+2. Extract failure information.
+3. Identify Jenkins job/build.
+4. Retrieve pipeline metadata.
+5. Retrieve failed stage.
+6. Retrieve relevant logs.
+7. Compare against previous successful build.
+8. Identify recent Git changes.
+9. Inspect relevant Bitbucket PR/commit.
+10. Query OpenSearch for correlated failures.
+11. Inspect Kubernetes/ArgoCD if deployment related.
+12. Build evidence chain.
+13. Generate hypotheses.
+14. Test hypotheses using tools.
+15. Determine root cause.
+16. Determine remediation.
+17. Classify remediation risk.
+18. Request approval if necessary.
+19. Execute remediation.
+20. Validate result.
+21. Update Jira.
+22. Notify development team.
+23. Learn/store the resolution for future incidents.
+
+Improve this workflow where necessary.
+
+---
+
+# 14. Root Cause Analysis
+
+The agent must distinguish between:
+
+* Symptom
+* Immediate failure
+* Contributing factor
+* Root cause
+* Correlated but unrelated events
+
+Do not allow the LLM to claim root cause without sufficient evidence.
+
+Design an evidence-based RCA mechanism.
+
+Every RCA should ideally contain:
+
+* Problem
+* Evidence
+* Investigation steps
+* Hypotheses considered
+* Root cause
+* Confidence score
+* Remediation
+* Validation
+* Supporting logs/links/builds/commits
+
+---
+
+# 15. Autonomous Remediation
+
+Create a remediation classification.
+
+For example:
+
+### Level 0 — Observation
+
+AI can investigate only.
+
+### Level 1 — Recommendation
+
+AI proposes remediation but does not execute.
+
+### Level 2 — Human Approval
+
+AI prepares remediation and waits for approval.
+
+### Level 3 — Low-Risk Autonomous
+
+AI can execute predefined safe actions automatically.
+
+### Level 4 — High-Risk
+
+Human approval is mandatory.
+
+Define what types of actions belong in each level.
+
+Do not allow arbitrary LLM-generated shell commands to directly modify production infrastructure.
+
+---
+
+# 16. Human-in-the-Loop
+
+Design where humans should remain involved.
+
+Examples:
+
+* Production changes
+* Code modifications
+* PR creation
+* Merge
+* Rollback
+* Infrastructure changes
+* Security-sensitive operations
+
+Determine whether Jira itself can act as an approval mechanism.
+
+---
+
+# 17. Knowledge / RAG
+
+Determine what information should be stored for future investigations.
+
+Potential sources:
+
+* Previous Jira incidents
+* Jenkins failures
+* RCA documents
+* Runbooks
+* DevOps standards
+* Architecture documentation
+* Known-error database
+* Git repositories
+* PR discussions
+* Ansible playbooks
+* Kubernetes troubleshooting guides
+* Historical remediation results
+
+Design:
+
+* What should be indexed
+* What should not be indexed
+* Embedding strategy
+* Retrieval strategy
+* Metadata
+* Access control
+* Knowledge freshness
+* Incident memory
+* Prevention of stale knowledge
+
+---
+
+# 18. Learning From Previous Incidents
+
+The system should improve over time.
+
+For example:
+
+Failure:
+
+> Maven dependency resolution failed
+
+Previous incident:
+
+> Repository connectivity issue
+
+Previous remediation:
+
+> Restart proxy service
+
+Future incident:
+
+> AI retrieves previous successful investigation and validates whether the same pattern exists.
+
+Design how this should work without allowing the agent to blindly repeat previous remediation.
+
+---
+
+# 19. Security
+
+The environment is enterprise-grade.
+
+Design security for:
+
+* Service accounts
+* RBAC
+* Secrets
+* Credentials
+* API tokens
+* Kubernetes permissions
+* Jenkins permissions
+* Bitbucket permissions
+* Jira permissions
+* Ansible permissions
+* LLM access
+* Prompt injection
+* Malicious repository content
+* Untrusted logs
+* Tool poisoning
+* Data exfiltration
+* Privilege escalation
+* Command injection
+
+Assume logs, Git repositories and Jira tickets may contain malicious or untrusted text.
+
+The architecture must treat external/system data as **untrusted input to the agent**.
+
+---
+
+# 20. Air-Gapped Architecture
+
+The solution must operate without Internet access.
+
+Explain:
+
+* LLM hosting
+* Model serving
+* Container images
+* Python/Node dependencies
+* Package repositories
+* Model updates
+* Embedding models
+* Vector database
+* RAG
+* Observability
+* Vulnerability scanning
+* Offline updates
+* Dependency management
+
+Identify all components that must be hosted internally.
+
+---
+
+# 21. Reliability
+
+Design for failures of the AI itself.
+
+What happens if:
+
+* LLM is unavailable?
+* Agent crashes?
+* Tool times out?
+* Jenkins API is unavailable?
+* OpenSearch is unavailable?
+* Kubernetes API is unavailable?
+* Jira is unavailable?
+* Ansible job fails?
+* Remediation partially succeeds?
+* Agent reaches conflicting conclusions?
+* Agent loops indefinitely?
+
+Define:
+
+* Timeouts
+* Retry policies
+* Circuit breakers
+* Maximum tool calls
+* Maximum investigation time
+* Human escalation
+* State persistence
+* Resume/recovery
+
+---
+
+# 22. Observability of the AI Agent
+
+The AI platform itself must be observable.
+
+Track:
+
+* Agent executions
+* Tool calls
+* Prompts
+* Model responses
+* Decisions
+* Token usage
+* Latency
+* Failures
+* Remediation actions
+* Approvals
+* RCA confidence
+* Success rate
+* False positives
+* False remediations
+
+Recommend an appropriate observability architecture using the available enterprise tooling.
+
+---
+
+# 23. Metrics / KPIs
+
+Define measurable business outcomes.
+
+Examples:
+
+* Mean time to acknowledge
+* Mean time to investigate
+* Mean time to resolve
+* Percentage of failures automatically diagnosed
+* Percentage automatically remediated
+* First-time resolution rate
+* Human escalation rate
+* False diagnosis rate
+* Repeat incident rate
+* Developer waiting time
+* DevOps engineer effort saved
+
+Provide a recommended KPI framework.
+
+---
+
+# 24. Architecture Deliverables
+
+Once requirements are sufficiently understood, produce the following.
+
+## A. Executive Architecture
+
+Explain the proposed solution in simple terms.
+
+## B. Logical Architecture
+
+Show:
+
+```text
+Developer
+   |
+   v
+Jira
+   |
+   v
+AI Agent Platform
+   |
+   +---- Jenkins
+   +---- Bitbucket
+   +---- OpenSearch
+   +---- Kubernetes
+   +---- ArgoCD
+   +---- Argo Workflows
+   +---- Ansible
+```
+
+Improve this architecture significantly based on the requirements.
+
+## C. Agent Architecture
+
+Define:
+
+* Agents
+* Responsibilities
+* Inputs
+* Outputs
+* Tools
+* Permissions
+* Communication
+* Escalation
+
+## D. Tool Architecture
+
+Define every tool available to the agents.
+
+For each tool specify:
+
+| Tool | Purpose | Read/Write | Risk | Approval |
+| ---- | ------- | ---------- | ---- | -------- |
+
+## E. End-to-End Workflow
+
+Show the complete lifecycle:
+
+```text
+Jira
+ ↓
+Trigger
+ ↓
+Investigation
+ ↓
+Evidence Collection
+ ↓
+RCA
+ ↓
+Decision
+ ↓
+Remediation
+ ↓
+Validation
+ ↓
+Jira Update
+ ↓
+Developer Notification
+```
+
+## F. Failure Scenarios
+
+Provide at least 10 realistic CI/CD failure scenarios.
+
+For each scenario show:
+
+* Detection
+* Investigation
+* Evidence
+* RCA
+* Remediation
+* Approval requirement
+* Validation
+* Jira update
+
+## G. Security Architecture
+
+Provide detailed security boundaries.
+
+## H. RAG / Knowledge Architecture
+
+Explain how previous incidents become reusable knowledge.
+
+## I. Deployment Architecture
+
+Explain how the complete platform would run in Kubernetes / air-gapped infrastructure.
+
+## J. State Management
+
+Explain where agent state is stored and how interrupted investigations resume.
+
+## K. Audit Architecture
+
+Explain how every AI decision and action is audited.
+
+---
+
+# 25. Implementation Roadmap
+
+Do NOT recommend building the complete autonomous platform immediately.
+
+Create a phased implementation.
+
+For example:
+
+### Phase 1
+
+Read-only CI/CD investigation.
+
+### Phase 2
+
+RCA + Jira automation.
+
+### Phase 3
+
+Human-approved remediation.
+
+### Phase 4
+
+Low-risk autonomous remediation.
+
+### Phase 5
+
+Advanced multi-system troubleshooting.
+
+### Phase 6
+
+Predictive/preventive DevOps automation.
+
+For every phase provide:
+
+* Scope
+* Components
+* Agents
+* Tools
+* Permissions
+* Risks
+* Success criteria
+
+---
+
+# 26. MVP
+
+Define the smallest realistic MVP that demonstrates business value.
+
+The MVP should preferably focus on a limited number of common Jenkins failures.
+
+Explain:
+
+* What the MVP does
+* What it deliberately does NOT do
+* Required integrations
+* Required tools
+* Required model capability
+* Required infrastructure
+* Expected user workflow
+* Success metrics
+
+---
+
+# 27. Architecture Decision Records
+
+Identify major architectural decisions that need to be made.
+
+For each provide:
+
+* Decision
+* Options
+* Pros
+* Cons
+* Recommendation
+* Reason
+
+Pay particular attention to:
+
+1. Single agent vs multi-agent
+2. OpenCode vs custom agent runtime
+3. Argo Workflows vs agent orchestration
+4. Direct tool access vs tool gateway
+5. RAG vs structured incident knowledge
+6. Jira as trigger vs event-driven architecture
+7. Synchronous vs asynchronous investigation
+8. Human approval model
+9. LLM-generated remediation vs predefined remediation
+10. Where agent memory should live
+
+---
+
+# 28. Challenge My Assumptions
+
+Throughout the design, explicitly identify:
+
+### "I would challenge this assumption"
+
+and explain why.
+
+Do not simply agree with my proposed architecture.
+
+Prioritize:
+
+* Reliability
+* Security
+* Simplicity
+* Auditability
+* Deterministic execution
+* Enterprise operability
+
+over making the system appear highly autonomous.
+
+---
+
+# 29. Expected Final Architecture
+
+The final solution should aim toward a model similar to:
+
+```text
+                         ┌─────────────────────┐
+                         │     Developer       │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │        Jira         │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────┐
+                    │    DevOps AI Agent Platform │
+                    │                             │
+                    │  Agent Runtime / Manager    │
+                    │           │                 │
+                    │     ┌─────┴─────┐           │
+                    │     │   Qwen    │           │
+                    │     └───────────┘           │
+                    │           │                 │
+                    │     Policy / Guardrails     │
+                    │           │                 │
+                    │      Tool Gateway           │
+                    └───────────┬─────────────────┘
+                                │
+       ┌────────────────────────┼────────────────────────┐
+       │                        │                        │
+       ▼                        ▼                        ▼
+   Jenkins                  Bitbucket                OpenSearch
+       │                        │                        │
+       └────────────────────────┼────────────────────────┘
+                                │
+                                ▼
+                    Kubernetes / ArgoCD
+                                │
+                                ▼
+                         Argo Workflows
+                                │
+                                ▼
+                    Ansible Automation Platform
+```
+
+However, **do not treat this diagram as the final architecture**.
+
+Critically evaluate it and change it wherever necessary.
+
+---
+
+# Final Design Principles
+
+The solution should follow these principles:
+
+1. **AI investigates; deterministic systems execute.**
+2. **Least privilege by default.**
+3. **Read-only before write access.**
+4. **Evidence before RCA.**
+5. **RCA before remediation.**
+6. **Validation after remediation.**
+7. **Human approval for risky operations.**
+8. **Every action must be auditable.**
+9. **Untrusted logs/repository content must never automatically become trusted instructions.**
+10. **The system must fail safely.**
+11. **Prefer deterministic workflows over unconstrained agent autonomy.**
+12. **Start simple and evolve toward multi-agent architecture only where justified.**
+13. **The architecture must work completely inside an air-gapped environment.**
+14. **The system should be able to resume interrupted investigations.**
+15. **Previous incidents should improve future investigations without blindly repeating previous actions.**
+
+---
+
+# How I Want You To Work With Me
+
+Start by asking me the **10–15 most important questions** needed to design this system.
+
+Do not provide the final architecture yet.
+
+Group your questions into logical categories.
+
+After I answer:
+
+1. Identify what is now clear.
+2. Identify remaining gaps.
+3. Ask the next set of questions.
+4. Continue until you have enough information.
+5. Then produce the complete architecture and implementation roadmap.
+
+If any requirement is contradictory, unrealistic, insecure or unnecessarily complex, explicitly challenge it.
+
+Your goal is not merely to design an AI chatbot.
+
+Your goal is to design a **production-grade autonomous DevOps troubleshooting and remediation platform for an enterprise air-gapped environment**.
